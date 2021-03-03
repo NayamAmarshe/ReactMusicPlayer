@@ -1,7 +1,9 @@
 import React from "react";
 
-export default function LibrarySong({ song }) {
-    function songSelectHandler(e) {}
+export default function LibrarySong({ song, songs, setCurrentSong }) {
+    function songSelectHandler(e) {
+        const selectedSong = songs.filter();
+    }
     return (
         <div onClick={songSelectHandler} className="library-song">
             <img src={song.cover} alt="Song Cover" />
