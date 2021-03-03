@@ -1,16 +1,52 @@
 import React from "react";
 
-export default function LibrarySong({ song, songs, setCurrentSong }) {
-    function songSelectHandler(e) {
-        const selectedSong = songs.filter();
-    }
-    return (
-        <div onClick={songSelectHandler} className="library-song">
-            <img src={song.cover} alt="Song Cover" />
-            <div className="song-description">
-                <h3>{song.name}</h3>
-                <h4>{song.artist}</h4>
-            </div>
-        </div>
-    );
+export default function LibrarySong({
+	song,
+	songs,
+	setCurrentSong,
+	AudioRef,
+	isPlaying,
+	setSongs,
+	id,
+}) {
+	//Event Handlers
+	function songSelectHandler(e) {
+		const updateSongStates = songs.map((listSong) => {
+			if (listSong === song) {
+				return {
+					...listSong,
+					active: true,
+				};
+			} else {
+				return {
+					...listSong,
+					active: false,
+				};
+			}
+		});
+		setSongs(updateSongStates);
+		setCurrentSong(song);
+		if (isPlaying) {
+			const playPromise = AudioRef.current.play();
+			if (playPromise !== undefined) {
+				playPromise.then((audio) => {
+					AudioRef.current.play();
+				});
+			}
+		}
+	}
+
+	//MAIN
+	return (
+		<div
+			onClick={songSelectHandler}
+			className={`library-song ${song.active ? "selected" : ""}`}
+		>
+			<img src={song.cover} alt="Song Cover" />
+			<div className="song-description">
+				<h3>{song.name}</h3>
+				<h4>{song.artist}</h4>
+			</div>
+		</div>
+	);
 }
