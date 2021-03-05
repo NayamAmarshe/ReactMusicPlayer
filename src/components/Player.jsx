@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
 	faPlay,
@@ -14,10 +14,13 @@ export default function Player({
 	AudioRef,
 	songInfo,
 	setSongInfo,
+	songs,
+	setCurrentSong,
 }) {
 	//Ref
 
 	//Event Handlers
+
 	function playSongHandler() {
 		if (isPlaying) {
 			AudioRef.current.pause();
@@ -39,6 +42,21 @@ export default function Player({
 		AudioRef.current.currentTime = e.target.value;
 		setSongInfo({ ...songInfo, currentTime: e.target.value });
 	}
+	function skipTrackHandler(direction) {
+		let currentSongIndex = songs.findIndex(
+			(songFromIndex) => songFromIndex.id === currentSong.id
+		);
+		if (direction === "skip-forward") {
+			setCurrentSong(songs[(currentSongIndex + 1) % songs.length]);
+		}
+		if (direction === "skip-back") {
+			if ((currentSongIndex - 1) % songs.length === -1) {
+				setCurrentSong(songs[songs.length - 1]);
+				return;
+			}
+			setCurrentSong(songs[(currentSongIndex - 1) % songs.length]);
+		}
+	}
 
 	//Main
 	return (
@@ -59,6 +77,7 @@ export default function Player({
 					className="skip-back"
 					size="2x"
 					icon={faAngleLeft}
+					onClick={() => skipTrackHandler("skip-back")}
 				/>
 
 				<FontAwesomeIcon
@@ -72,6 +91,7 @@ export default function Player({
 					className="skip-forward"
 					size="2x"
 					icon={faAngleRight}
+					onClick={() => skipTrackHandler("skip-forward")}
 				/>
 			</div>
 		</div>
