@@ -1,5 +1,4 @@
 import React from "react";
-
 export default function LibrarySong({
 	song,
 	songs,
@@ -10,7 +9,7 @@ export default function LibrarySong({
 	id,
 }) {
 	//Event Handlers
-	function songSelectHandler(e) {
+	async function songSelectHandler(e) {
 		const updateSongStates = songs.map((listSong) => {
 			if (listSong === song) {
 				return {
@@ -24,15 +23,10 @@ export default function LibrarySong({
 				};
 			}
 		});
-		setSongs(updateSongStates);
-		setCurrentSong(song);
+		await setSongs(updateSongStates);
+		await setCurrentSong(song);
 		if (isPlaying) {
-			const playPromise = AudioRef.current.play();
-			if (playPromise !== undefined) {
-				playPromise.then((audio) => {
-					AudioRef.current.play();
-				});
-			}
+			AudioRef.current.play();
 		}
 	}
 

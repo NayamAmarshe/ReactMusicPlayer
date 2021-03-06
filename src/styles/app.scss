@@ -4,20 +4,34 @@
 @import "./nav";
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: "Poppins", sans-serif;
 }
 
 h1,
 h2,
 h3 {
-    color: rgb(54, 54, 54);
+	color: rgb(54, 54, 54);
 }
 
 h3,
 h4 {
-    font-weight: 400;
-    color: rgb(109, 109, 109);
+	font-weight: 400;
+	color: rgb(109, 109, 109);
+}
+
+.App {
+	transition: all 0.5s ease;
+}
+
+.library-active {
+	margin-left: 30%;
+}
+
+@media screen and (max-width: 768px) {
+	.library-active {
+		margin-left: 0%;
+	}
 }

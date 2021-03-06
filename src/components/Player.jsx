@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
 	faPlay,
@@ -16,11 +16,27 @@ export default function Player({
 	setSongInfo,
 	songs,
 	setCurrentSong,
+	setSongs,
 }) {
-	//Ref
+	//Use
+	function songListUpdating(nextPrev) {
+		const updateSongStates = songs.map((listSong) => {
+			if (listSong.id === nextPrev.id) {
+				return {
+					...listSong,
+					active: true,
+				};
+			} else {
+				return {
+					...listSong,
+					active: false,
+				};
+			}
+		});
+		setSongs(updateSongStates);
+	}
 
 	//Event Handlers
-
 	function playSongHandler() {
 		if (isPlaying) {
 			AudioRef.current.pause();
@@ -38,41 +54,72 @@ export default function Player({
 			("0" + Math.floor(time % 60)).slice(-2)
 		);
 	}
+
 	function dragHandler(e) {
 		AudioRef.current.currentTime = e.target.value;
 		setSongInfo({ ...songInfo, currentTime: e.target.value });
 	}
-	function skipTrackHandler(direction) {
+
+	async function skipTrackHandler(direction) {
 		let currentSongIndex = songs.findIndex(
 			(songFromIndex) => songFromIndex.id === currentSong.id
 		);
 		if (direction === "skip-forward") {
-			setCurrentSong(songs[(currentSongIndex + 1) % songs.length]);
+			await setCurrentSong(songs[(currentSongIndex + 1) % songs.length]);
+			songListUpdating(songs[(currentSongIndex + 1) % songs.length]);
 		}
 		if (direction === "skip-back") {
 			if ((currentSongIndex - 1) % songs.length === -1) {
-				setCurrentSong(songs[songs.length - 1]);
+				await setCurrentSong(songs[songs.length - 1]);
+				if (isPlaying) {
+					AudioRef.current.play();
+				}
+				songListUpdating(songs[(currentSongIndex - 1) % songs.length]);
 				return;
 			}
-			setCurrentSong(songs[(currentSongIndex - 1) % songs.length]);
+			await setCurrentSong(songs[(currentSongIndex - 1) % songs.length]);
+			songListUpdating(songs[(currentSongIndex - 1) % songs.length]);
+		}
+		if (isPlaying) {
+			AudioRef.current.play();
 		}
 	}
 
-	//Main
+	//Styles
+	const trackAnim = {
+		transform: `translateX(${songInfo.animationPercentage}%)`,
+	};
+	const gradientBar = {
+		background: `linear-gradient(to right, ${currentSong.color[0]}, ${currentSong.color[1]})`,
+	};
+	const gradientColor = {
+		color: `linear-gradient(to right, ${currentSong.color[0]}, ${currentSong.color[1]})`,
+	};
+	////////////////////
+	//				  //
+	//     Main       //
+	////////////////////
 	return (
 		<div className="player">
-			<div className="time-control">
+			<div className="time-control" style={gradientColor}>
 				<p>{convertTime(songInfo.currentTime)}</p>
-				<input
-					min={0}
-					max={songInfo.duration || 0}
-					type="range"
-					value={songInfo.currentTime}
-					onChange={dragHandler}
-				/>
-				<p>{convertTime(songInfo.duration)}</p>
+				<div className="track" style={gradientBar}>
+					<input
+						type="range"
+						min={0}
+						max={songInfo.duration || 0}
+						value={songInfo.currentTime}
+						onChange={dragHandler}
+					/>
+					<div style={trackAnim} className="animate-track" />
+				</div>
+				<p>
+					{songInfo.duration
+						? convertTime(songInfo.duration)
+						: "0:00"}
+				</p>
 			</div>
-			<div className="play-control">
+			<div className="play-control" style={gradientColor}>
 				<FontAwesomeIcon
 					className="skip-back"
 					size="2x"
